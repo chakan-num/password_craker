@@ -68,21 +68,21 @@ public class PWCrackClient {
 	private static void work() {
 		try {
 			while(true){
-				lock.lock();
 				int cur_client_id = c_info.client_id;
+				lock.lock();
 				boolean check_isDone = client.isDone();
 				lock.unlock();
 				if(check_isDone) break;
-				
-				String prefix;
+			
+				String prefix;	
 				lock.lock();
-				if ( client.getTask(cur_client_id) != null )
-					prefix = client.getTask(cur_client_id).prefix;
+				Task temp = client.getTask(cur_client_id);
+				lock.unlock();
+				if ( temp != null )
+					prefix = temp.prefix;
 				else{
-					lock.unlock();
 					break;
 				}
-				lock.unlock();
 
 				StringGenerator task = new StringGenerator(4);
 				while(task.hasNextString()){
@@ -109,8 +109,8 @@ public class PWCrackClient {
 				client.ping(c_info.client_id);
 				if(client.isDone()) {
 					//if(err_flag != null) while(1) ;
-					lock.unlock();
 					client.deleteNodebyID(c_info.client_id);
+					lock.unlock();
 					break;
 				}
 				lock.unlock();
